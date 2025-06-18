@@ -1,0 +1,72 @@
+name: Main Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Build:
+    runs-on: self-hosted
+    env:
+      BuildConfiguration: 'Release' # Define the configuration as an environment variable
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Restore Dependencies
+        uses: ./.github/actions/Dotnet-actions
+        with:
+          command: restore
+          projects: '**/*.csproj'
+          nugetConfigPath: ./NuGet.config
+          packagesDirectory: "path/to/packages"
+          noCache: true
+          nuGetPath: './nuget.exe'
+          nuGetVersion: '5.11.0'
+          solution: './OrchardCore.sln'
+          configuration: '${{ env.BuildConfiguration }}' # Use the environment variable
+
+      - name: Build Project
+        uses: ./.github/actions/Dotnet-actions
+        with:
+          command: build
+          projects: '**/*.csproj'
+          nugetConfigPath: ./NuGet.config
+          packagesDirectory: "path/to/packages"
+          arguments: null
+          nuGetPath: './nuget.exe'
+          nuGetVersion: '5.11.0'
+          solution: './OrchardCore.sln'
+          configuration: '${{ env.BuildConfiguration }}' # Use the environment variable
+          packDirectory: '$(Build.ArtifactStagingDirectory)'
+
+      - name: Run Tests
+        uses: ./.github/actions/Dotnet-actions
+        with:
+          command: test
+          projects: '**/*.csproj'
+          arguments: null
+         
+          
+      - name: Pack Project
+        uses: ./.github/actions/Dotnet-actions
+        with:
+          command: pack
+          projects: '**/*.csproj'
+          arguments: null
+          nuGetPath: './nuget.exe'
+          nuGetVersion: '5.11.0'
+          solution: './OrchardCore.sln'
+
+      - name: Publish Project
+        uses: ./.github/actions/Dotnet-actions
+        with:
+          command: publish
+          projects: '**/*.csproj'
+          arguments: null
+          nexusUrl : "https://your-nexus-repository-url/repository/your-repo-name/" 
+          nexusUsername : "admin"
+          nexusPassword : "Hexaware@2025"
+          
+    
