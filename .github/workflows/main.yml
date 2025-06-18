@@ -22,7 +22,7 @@ jobs:
           nugetConfigPath: ./NuGet.config
           packagesDirectory: "path/to/packages"
           noCache: true
-          nuGetPath: './nuget.exe'
+          nuGetPath: 'nuget.exe'
           nuGetVersion: '5.11.0'
           solution: './OrchardCore.sln'
           configuration: '${{ env.BuildConfiguration }}' # Use the environment variable
@@ -35,7 +35,7 @@ jobs:
           nugetConfigPath: ./NuGet.config
           packagesDirectory: "path/to/packages"
           arguments: null
-          nuGetPath: './nuget.exe'
+          nuGetPath: 'nuget.exe'
           nuGetVersion: '5.11.0'
           solution: './OrchardCore.sln'
           configuration: '${{ env.BuildConfiguration }}' # Use the environment variable
@@ -55,7 +55,7 @@ jobs:
           command: pack
           projects: '**/*.csproj'
           arguments: null
-          nuGetPath: './nuget.exe'
+          nuGetPath: 'nuget.exe'
           nuGetVersion: '5.11.0'
           solution: './OrchardCore.sln'
 
