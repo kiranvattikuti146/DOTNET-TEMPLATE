@@ -65,7 +65,7 @@ jobs:
           command: publish
           projects: '**/*.csproj'
           arguments: null
-          nexusUrl : "https://your-nexus-repository-url/repository/your-repo-name/" 
+          nexusUrl : "http://10.0.0.5:8081/repository/nuget-group/" 
           nexusUsername : "admin"
           nexusPassword : "Hexaware@2025"
           
