@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+env: 
+  nexus_username: ${{ secrets.NEXUS_USERNAME }}
+  nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
 jobs:
   Build:
@@ -48,7 +53,6 @@ jobs:
           projects: '**/*.csproj'
           arguments: null
          
-          
       - name: Pack Project
         uses: ./.github/actions/Dotnet-actions
         with:
@@ -65,8 +69,4 @@ jobs:
           command: publish
           projects: '**/*.csproj'
           arguments: null
-          nexusUrl : "http://10.0.0.5:8081/repository/nuget-group/" 
-          nexusUsername : "admin"
-          nexusPassword : "Hexaware@2025"
-          
-    
+        
