@@ -24,7 +24,7 @@ jobs:
           command: restore
           projects: '**/*.csproj'
           nugetConfigPath: ./NuGet.config
-          packagesDirectory: "path/to/packages"
+          packagesDirectory: "${{ github.workspace }}/packages"
           noCache: true
           nuGetPath: 'nuget.exe'
           nuGetVersion: '5.11.0'
@@ -37,7 +37,7 @@ jobs:
           command: build
           projects: '**/*.csproj'
           nugetConfigPath: ./NuGet.config
-          packagesDirectory: "path/to/packages"
+          packagesDirectory: "${{ github.workspace }}/packages"
           arguments: null
           nuGetPath: 'nuget.exe'
           nuGetVersion: '5.11.0'
