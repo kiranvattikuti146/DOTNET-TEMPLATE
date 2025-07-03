@@ -18,7 +18,7 @@ jobs:
         uses: ./.github/actions/Dotnet-actions
         with:
           command: restore
-          projects: '**/*.csproj' # Pattern to match project files
+          projects: 'OrchardCore.Docs.csproj'
           solution: './OrchardCore.sln' # Path to the solution file
           configuration: '${{ env.BuildConfiguration }}' # Use the environment variable
 
