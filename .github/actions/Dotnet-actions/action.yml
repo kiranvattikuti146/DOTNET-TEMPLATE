@@ -41,27 +41,3 @@ runs:
       shell: pwsh
       run: |
         dotnet build ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
-
-    - name: Test
-      shell: pwsh
-      run: |
-        $testCommand = "dotnet test `"$projects`""
-        if ($arguments) { $testCommand += " $arguments" }
-        Write-Host "Executing: $testCommand"
-        Invoke-Expression $testCommand
-
-    - name: Pack
-      shell: pwsh
-      run: |
-        $packCommand = "dotnet pack `"$projects`""
-        if ($arguments) { $packCommand += " $arguments" }
-        Write-Host "Executing: $packCommand"
-        Invoke-Expression $packCommand
-
-    - name: Publish
-      shell: pwsh
-      run: |
-        $publishCommand = "dotnet publish `"$projects`""
-        if ($arguments) { $publishCommand += " $arguments" }
-        Write-Host "Executing: $publishCommand"
-        Invoke-Expression $publishCommand
