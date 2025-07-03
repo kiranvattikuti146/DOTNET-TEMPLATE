@@ -10,11 +10,8 @@ inputs:
   arguments:
     required: false
     type: string
-  restoreArguments:
-    required: false
-    type: string
   solution:
-    required: true
+    required: false
     type: string
   configuration: 
     required: true
@@ -23,21 +20,63 @@ inputs:
 runs:
   using: 'composite'  
   steps:
-  
+    # Validate Solution Path (if provided)
     - name: Validate Solution Path
       shell: pwsh
       run: |
-        if (!(Test-Path "${{ inputs.solution }}")) {
+        if (${{ inputs.solution }} -and !(Test-Path "${{ inputs.solution }}")) {
           Write-Error "Solution file not found at path: ${{ inputs.solution }}"
           exit 1
         }
 
+    # Restore Dependencies using Solution or Projects
     - name: Restore Dependencies
       shell: pwsh
       run: |
-        dotnet restore ${{ inputs.solution }} ${{ inputs.restoreArguments }}
+        if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
+          # Restore using the solution file
+          dotnet restore ${{ inputs.solution }}
+        } else {
+          # Restore using project files
+          dotnet restore ${{ inputs.projects }}
+        }
 
+    # Build the project or solution
     - name: Build
       shell: pwsh
       run: |
-        dotnet build ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
+          dotnet build ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        } else {
+          dotnet build ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        }
+
+    # Test the project or solution
+    - name: Test
+      shell: pwsh
+      run: |
+        if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
+          dotnet test ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        } else {
+          dotnet test ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        }
+
+    # Pack the project or solution
+    - name: Pack
+      shell: pwsh
+      run: |
+        if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
+          dotnet pack ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        } else {
+          dotnet pack ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        }
+
+    # Publish the project or solution
+    - name: Publish
+      shell: pwsh
+      run: |
+        if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
+          dotnet publish ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        } else {
+          dotnet publish ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+        }
