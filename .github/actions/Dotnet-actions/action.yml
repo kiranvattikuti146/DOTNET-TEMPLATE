@@ -34,10 +34,7 @@ runs:
       id: resolve-projects
       shell: pwsh
       run: |
-        $projects = @()
-        if (${{ inputs.projects }}) {
-          $projects = Get-ChildItem -Path ${{ inputs.projects }} -Recurse -File | ForEach-Object { $_.FullName }
-        }
+        $projects = Get-ChildItem -Path . -Recurse -Include ${{ inputs.projects }} -File | ForEach-Object { $_.FullName }
         if (-not $projects) {
           Write-Error "No project files found matching the pattern: ${{ inputs.projects }}"
           exit 1
