@@ -29,12 +29,18 @@ runs:
           exit 1
         }
 
+    # Debugging Step: List Files in the Directory
+    - name: List Files in Directory
+      shell: pwsh
+      run: |
+        Get-ChildItem -Path . -Recurse
+
     # Resolve Project Files from Glob Pattern
     - name: Resolve Project Files
       id: resolve-projects
       shell: pwsh
       run: |
-        $projects = Get-ChildItem -Path . -Recurse -Include ${{ inputs.projects }} -File | ForEach-Object { $_.FullName }
+        $projects = Get-ChildItem -Path . -Recurse -Filter "*.csproj" -File | ForEach-Object { $_.FullName }
         if (-not $projects) {
           Write-Error "No project files found matching the pattern: ${{ inputs.projects }}"
           exit 1
