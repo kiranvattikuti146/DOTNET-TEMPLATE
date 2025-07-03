@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 jobs:
   Build:
     runs-on: windows-latest
@@ -19,8 +18,8 @@ jobs:
         uses: ./.github/actions/Dotnet-actions
         with:
           command: restore
-          projects: '**/*.csproj'
-          solution: './OrchardCore.sln'
+          projects: '**/*.csproj' # Pattern to match project files
+          solution: './OrchardCore.sln' # Path to the solution file
           configuration: '${{ env.BuildConfiguration }}' # Use the environment variable
 
       - name: Build Project
