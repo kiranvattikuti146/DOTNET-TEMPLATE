@@ -29,6 +29,22 @@ runs:
           exit 1
         }
 
+    # Resolve Project Files from Glob Pattern
+    - name: Resolve Project Files
+      id: resolve-projects
+      shell: pwsh
+      run: |
+        $projects = @()
+        if (${{ inputs.projects }}) {
+          $projects = Get-ChildItem -Path ${{ inputs.projects }} -Recurse -File | ForEach-Object { $_.FullName }
+        }
+        if (-not $projects) {
+          Write-Error "No project files found matching the pattern: ${{ inputs.projects }}"
+          exit 1
+        }
+        $projects -join "`n" | Out-File -FilePath resolved_projects.txt
+      continue-on-error: false
+
     # Restore Dependencies using Solution or Projects
     - name: Restore Dependencies
       shell: pwsh
@@ -37,8 +53,8 @@ runs:
           # Restore using the solution file
           dotnet restore ${{ inputs.solution }}
         } else {
-          # Restore using project files
-          dotnet restore ${{ inputs.projects }}
+          # Restore using resolved project files
+          Get-Content resolved_projects.txt | ForEach-Object { dotnet restore $_ }
         }
 
     # Build the project or solution
@@ -48,7 +64,7 @@ runs:
         if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
           dotnet build ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
         } else {
-          dotnet build ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+          Get-Content resolved_projects.txt | ForEach-Object { dotnet build $_ --configuration ${{ inputs.configuration }} ${{ inputs.arguments }} }
         }
 
     # Test the project or solution
@@ -58,7 +74,7 @@ runs:
         if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
           dotnet test ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
         } else {
-          dotnet test ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+          Get-Content resolved_projects.txt | ForEach-Object { dotnet test $_ --configuration ${{ inputs.configuration }} ${{ inputs.arguments }} }
         }
 
     # Pack the project or solution
@@ -68,7 +84,7 @@ runs:
         if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
           dotnet pack ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
         } else {
-          dotnet pack ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+          Get-Content resolved_projects.txt | ForEach-Object { dotnet pack $_ --configuration ${{ inputs.configuration }} ${{ inputs.arguments }} }
         }
 
     # Publish the project or solution
@@ -78,5 +94,5 @@ runs:
         if (${{ inputs.solution }} -and (Test-Path "${{ inputs.solution }}")) {
           dotnet publish ${{ inputs.solution }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
         } else {
-          dotnet publish ${{ inputs.projects }} --configuration ${{ inputs.configuration }} ${{ inputs.arguments }}
+          Get-Content resolved_projects.txt | ForEach-Object { dotnet publish $_ --configuration ${{ inputs.configuration }} ${{ inputs.arguments }} }
         }
